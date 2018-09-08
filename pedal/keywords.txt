@@ -1,0 +1,4 @@
+Pedal	KEYWORD1
+check	KEYWORD2
+calibrate	KEYWORD2
+read	KEYWORD2
