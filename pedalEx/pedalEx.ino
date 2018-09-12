@@ -6,7 +6,6 @@ map linear pot to rotary pot during calibration, then run checks to see if map f
 
 void setup() {
 	// initialize digital pin PB11 as an output.
-	pinMode(PB11, OUTPUT);
 	pinMode(PA7, INPUT);
 	Serial.begin(9600);
 }
@@ -26,7 +25,6 @@ void loop() {
 	while(true){
 		val = ped.read();
 		Serial.println(val);
-		analogWrite(PB11, val);
 	}
 }
 
