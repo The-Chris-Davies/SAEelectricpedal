@@ -16,14 +16,14 @@
 class Pedal{
 	private:
 		byte potVal[255];				//the map between the values. Index is rotary, value is linear.
-		byte mini = -1, maxi = 0, err = 2;	//minimum, maximum, and error values for the rotary pot
+		byte mini = -1, maxi = 0, err = 5;	//minimum, maximum, and error values for the rotary pot
 		//note: for acceptable error, see EV2.3.6: the sensors must agree within 10% of pedal travel
 		int rot, lin;					//the pins to test
 		inline bool check(byte, byte);	//check if the byte is ok
 	
 	public:
 		Pedal(int, int);
-		void calibrate(int);			//fill in potVal
+		void calibrate();			//fill in potVal
 		byte read();					//test whether the values coorelate, and return throttle value (0-255)
 		
 };

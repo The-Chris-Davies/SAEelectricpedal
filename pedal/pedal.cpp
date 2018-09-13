@@ -21,22 +21,25 @@ inline bool Pedal::check(byte rotVal, byte linVal){
 	if(potVal[rotVal] < linVal+err && potVal[rotVal] > linVal-err)
 		return true;
 	return false;
-	
 }
 
-void Pedal::calibrate(int interruptPin){
+void Pedal::calibrate(){
 	byte currVal;
-	while(!digitalRead(interruptPin)){		//fix this! digitalRead is vv inefficient!!
-		currVal = analogRead(rot)>>2;
-		potVal[currVal] = analogRead(lin)>>2;
+	while(!Serial.available()){
+		currVal = analogRead(rot)>>4;
+		potVal[currVal] = analogRead(lin)>>4;
 		if(mini > currVal) mini = currVal;
 		else if(maxi < currVal) maxi = currVal;
 	}
+	Serial.print(mini); Serial.print(" = mini, maxi = "); Serial.println(maxi);
 }
 
 byte Pedal::read(){
-	byte currVal = analogRead(rot)>>2;
-	if(check(currVal, (byte)analogRead(lin)>>2))
+	byte currVal = analogRead(rot)>>4;
+	byte linVal = analogRead(lin)>>4;
+	if(check(currVal, linVal)){
 		return map(currVal, mini, maxi, 0, 255);
-	//error handling
+	}
+	//error handling here
+	Serial.print("Dead!");
 }

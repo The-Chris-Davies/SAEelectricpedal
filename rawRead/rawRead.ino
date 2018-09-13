@@ -1,5 +1,5 @@
 /*
-map linear pot to rotary pot during calibration, then run checks to see if map fails
+just reads the values from the specified pins and writes them to serial.
 
 */
 #include "pedal.h"
@@ -9,25 +9,25 @@ map linear pot to rotary pot during calibration, then run checks to see if map f
 
 void setup() {
 	// initialize digital pin ROTARYPIN1 as an output.
-	pinMode(PB10, INPUT);
+	pinMode(ROTARYPIN0, INPUT);
+	pinMode(PC13, OUTPUT);
 	Serial.begin(9600);
 }
 
 // the loop function runs over and over again forever
 void loop() {
+	byte lin, rot;
 	delay(500);
 	Serial.println("test start");
 	digitalWrite(PC13, HIGH);
-	Pedal ped(ROTARYPIN, LINEARPIN);
-	byte val;
-	ped.calibrate();
 	Serial.println("initialized");
 	digitalWrite(PC13, LOW);
-	delay(1000);
+	delay(500);
 	digitalWrite(PC13, HIGH);
-	delay(1000);
+	delay(500);
 	while(true){
-		val = ped.read();
-		Serial.println(val);
+		rot = analogRead(ROTARYPIN)>>4;
+		lin = analogRead(LINEARPIN)>>4;
+		Serial.print(rot); Serial.print(" : "); Serial.println(lin);
 	}
 }
