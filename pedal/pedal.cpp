@@ -14,6 +14,9 @@
 Pedal::Pedal(int rotaryPin, int linearPin){
 	rot = rotaryPin;
 	lin = linearPin;
+	mini = -1;
+	maxi = 0;
+	error = 0;
 	for(unsigned int i = 0; i < 256; i++) potVal[i] = 0;
 }
 
@@ -31,6 +34,7 @@ void Pedal::calibrate(){
 		if(mini > currVal) mini = currVal;
 		else if(maxi < currVal) maxi = currVal;
 	}
+	error = maxi-mini/10	//error is 10% of the range between maxi and mini
 	Serial.print(mini); Serial.print(" = mini, maxi = "); Serial.println(maxi);
 }
 
