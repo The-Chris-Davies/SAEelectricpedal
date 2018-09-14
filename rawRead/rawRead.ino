@@ -16,6 +16,7 @@ void setup() {
 	pinMode(PC13, OUTPUT);
 	Serial.begin(9600);
 	
+	//Test start
 	Serial.println("test start");
 	digitalWrite(PC13, HIGH);
 	Serial.println("initialized");
@@ -27,6 +28,7 @@ void setup() {
 
 // the loop function runs over and over again forever
 void loop() {
+	//Test main loop
 	rot = analogRead(ROTARYPIN)>>4;
 	lin = analogRead(LINEARPIN)>>4;
 	Serial.print(rot); Serial.print(" : "); Serial.println(lin);
