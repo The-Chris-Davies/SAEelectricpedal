@@ -7,17 +7,15 @@ just reads the values from the specified pins and writes them to serial.
 #define ROTARYPIN PB1
 #define LINEARPIN PB0
 
+Pedal ped(ROTARYPIN, LINEARPIN);
+byte lin, rot;
+
 void setup() {
 	// initialize digital pin ROTARYPIN1 as an output.
 	pinMode(ROTARYPIN0, INPUT);
 	pinMode(PC13, OUTPUT);
 	Serial.begin(9600);
-}
-
-// the loop function runs over and over again forever
-void loop() {
-	byte lin, rot;
-	delay(500);
+	
 	Serial.println("test start");
 	digitalWrite(PC13, HIGH);
 	Serial.println("initialized");
@@ -25,9 +23,12 @@ void loop() {
 	delay(500);
 	digitalWrite(PC13, HIGH);
 	delay(500);
-	while(true){
-		rot = analogRead(ROTARYPIN)>>4;
-		lin = analogRead(LINEARPIN)>>4;
-		Serial.print(rot); Serial.print(" : "); Serial.println(lin);
-	}
+}
+
+// the loop function runs over and over again forever
+void loop() {
+	rot = analogRead(ROTARYPIN)>>4;
+	lin = analogRead(LINEARPIN)>>4;
+	Serial.print(rot); Serial.print(" : "); Serial.println(lin);
+	Serial.print("Pedal::read() value: "); Serial.println(ped.read());
 }
