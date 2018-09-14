@@ -29,7 +29,7 @@ void Pedal::calibrate(){
 	bool flag =1;
 	while(!Serial.available()){
 		//Store the value of 'rot' into mini just on the first cycle
-		mini = flag == 1 ? analogRead(rot) >> 4: mini;
+		mini = flag == 1 ? analogRead(rot) >> 4: ;
 		flag =0;
 		currVal = analogRead(rot)>>4;
 		potVal[currVal] = analogRead(lin)>>4;
