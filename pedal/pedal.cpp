@@ -21,14 +21,16 @@ Pedal::Pedal(int rotaryPin, int linearPin){
 }
 
 inline bool Pedal::check(byte rotVal, byte linVal){
-	if(potVal[rotVal] < linVal+err && potVal[rotVal] > linVal-err)
-		return true;
-	return false;
+	return (potVal[rotVal] < linVal+err && potVal[rotVal] > linVal-err);
 }
 
 void Pedal::calibrate(){
 	byte currVal;
+	bool flag =1;
 	while(!Serial.available()){
+		//Store the value of 'rot' into mini just on the first cycle
+		mini = flag == 1 ? analogRead(rot) >> 4: mini;
+		flag =0;
 		currVal = analogRead(rot)>>4;
 		potVal[currVal] = analogRead(lin)>>4;
 		if(mini > currVal) mini = currVal;
@@ -43,6 +45,9 @@ byte Pedal::read(){
 	byte linVal = analogRead(lin)>>4;
 	if(check(currVal, linVal)){
 		return map(currVal, mini, maxi, 0, 255);
+	}
+	else{
+		//Maybe a flashing LED to indicate a problem?
 	}
 	//error handling here
 	Serial.print("Dead!");
