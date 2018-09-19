@@ -17,6 +17,7 @@ class Pedal{
 	private:
 		byte potVal[255];//the map between the values. Index is rotary, value is linear.
 		byte mini, maxi, err;	//minimum, maximum, and error values for the rotary pot
+		byte dZone[2];	//the dead zone at the top/bottom of the pedal.
 		//note: for acceptable error, see EV2.3.6: the sensors must agree within 10% of pedal travel
 		int rot, lin;					//the pins to test
 		inline bool check(byte, byte);	//check if the byte is ok
