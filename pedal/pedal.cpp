@@ -17,15 +17,15 @@ Pedal::Pedal(int rotaryPin, int linearPin){
 	mini = -1;
 	maxi = 0;
 	err = 0;
-	dZone = {10, 10};
+	dZone[0] = 10;
+	dZone[1] = 10;
 	for(unsigned int i = 0; i < 256; i++) potVal[i] = 0;
 	
 	//100ms timer for error
-	tim(2);
-	tim.setMode(TIMER_CH1, TIMER_OUTPUTCOMPARE);
-	tim.setPeriod(100000);	// 10Hz in microseconds
-	tim.attachCompare1Interrupt(printerrupt);
-	tim.pause();
+	Timer2.setMode(TIMER_CH1, TIMER_OUTPUTCOMPARE);
+	Timer2.setPeriod(100000);	// 10Hz in microseconds
+	Timer2.attachCompare1Interrupt([](){Serial.println("Error!");});
+	Timer2.pause();
 }
 
 inline bool Pedal::check(byte rotVal, byte linVal){
@@ -57,8 +57,8 @@ byte Pedal::read(){
 		
 		//disable timer if its running
 		if(flag){
-			tim.pause();
-			tim.refresh();
+			Timer2.pause();
+			Timer2.refresh();
 		}
 		
 		if(currVal < mini) return 0;
@@ -69,10 +69,6 @@ byte Pedal::read(){
 	//error
 	else{
 		flag = true;
-		tim.resume();
+		Timer2.resume();
 	}
-}
-
-void Pedal::printerrupt(){
-	Serial.println("Error raised!");
 }

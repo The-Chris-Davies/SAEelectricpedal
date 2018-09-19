@@ -19,10 +19,8 @@ class Pedal{
 		byte mini, maxi, err;	//minimum, maximum, and error values for the rotary pot
 		byte dZone[2];			//the dead zone at the top/bottom of the pedal.
 		bool flag;				//flag for error timer
-		HardwareTimer tim;		//the error timer
 		int rot, lin;					//the pins to test
 		inline bool check(byte, byte);	//check if the byte is ok
-		void printerrupt();		//interrupt for timer ISR
 	
 	public:
 		Pedal(int, int);
