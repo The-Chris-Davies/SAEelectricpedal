@@ -19,6 +19,13 @@ Pedal::Pedal(int rotaryPin, int linearPin){
 	err = 0;
 	dZone = {10, 10};
 	for(unsigned int i = 0; i < 256; i++) potVal[i] = 0;
+	
+	//100ms timer for error
+	tim(2);
+	tim.setMode(TIMER_CH1, TIMER_OUTPUTCOMPARE);
+	tim.setPeriod(100000);	// 10Hz in microseconds
+	tim.attachCompare1Interrupt(printerrupt);
+	tim.pause();
 }
 
 inline bool Pedal::check(byte rotVal, byte linVal){
@@ -41,16 +48,31 @@ void Pedal::calibrate(){
 }
 
 byte Pedal::read(){
+	//read and store the vals
 	byte currVal = analogRead(rot)>>4;
 	byte linVal = analogRead(lin)>>4;
+	
+	//check if there's an error
 	if(check(currVal, linVal)){
+		
+		//disable timer if its running
+		if(flag){
+			tim.pause();
+			tim.refresh();
+		}
+		
 		if(currVal < mini) return 0;
 		else if(currVal > maxi) return 255;
 		return map(currVal, mini, maxi, 0, 255);
 	}
+	
+	//error
 	else{
-		//Maybe a flashing LED to indicate a problem?
+		flag = true;
+		tim.resume();
 	}
-	//error handling here
-	Serial.print("Dead!");
+}
+
+void Pedal::printerrupt(){
+	Serial.println("Error raised!");
 }
