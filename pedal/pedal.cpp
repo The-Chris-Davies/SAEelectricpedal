@@ -12,6 +12,7 @@
 #include "pedal.h"
 
 Pedal::Pedal(int rotaryPin, int linearPin){
+	//value initialization
 	rot = rotaryPin;
 	lin = linearPin;
 	mini = -1;
@@ -28,27 +29,36 @@ Pedal::Pedal(int rotaryPin, int linearPin){
 	Timer2.pause();
 }
 
+//returns true if error is within acceptable levels
 inline bool Pedal::check(byte rotVal, byte linVal){
 	return (potVal[rotVal] < linVal+err && potVal[rotVal] > linVal-err);
 }
 
 void Pedal::calibrate(){
 	byte currVal;
+	
+	//initialize mini to current value
 	mini = analogRead(rot) >> 4;
+	
+	//populate map with read values
 	while(!Serial.available()){
 		currVal = analogRead(rot)>>4;
 		potVal[currVal] = analogRead(lin)>>4;
 		if(mini > currVal) mini = currVal;
 		else if(maxi < currVal) maxi = currVal;
 	}
+	
+	//add dead zone
 	mini -= dZone[0];
 	maxi -= dZone[1];
-	err = maxi-mini/10;	//error is 10% of the range between maxi and mini
+	
+	//initialize error: error is 10% of the range between maxi and mini
+	err = maxi-mini/10;
 	Serial.print(mini); Serial.print(" = mini, maxi = "); Serial.println(maxi);
 }
 
 byte Pedal::read(){
-	//read and store the vals
+	//read and store the values
 	byte currVal = analogRead(rot)>>4;
 	byte linVal = analogRead(lin)>>4;
 	
@@ -60,10 +70,8 @@ byte Pedal::read(){
 			Timer2.pause();
 			Timer2.refresh();
 		}
-		
-		if(currVal < mini) return 0;
-		else if(currVal > maxi) return 255;
-		return map(currVal, mini, maxi, 0, 255);
+		//return pedal position, mapped between 0 and 255
+		return constrain(map(currVal, mini, maxi, 0, 255), 0, 255);
 	}
 	
 	//error
