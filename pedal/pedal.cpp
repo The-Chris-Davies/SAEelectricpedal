@@ -10,6 +10,11 @@
 
 #include "Arduino.h"
 #include "pedal.h"
+void printErr(){
+	while(true){
+		Serial.println("Error!");
+	}
+}
 
 Pedal::Pedal(int rotaryPin, int linearPin){
 	//value initialization
@@ -25,7 +30,7 @@ Pedal::Pedal(int rotaryPin, int linearPin){
 	//100ms timer for error
 	Timer2.setMode(TIMER_CH1, TIMER_OUTPUTCOMPARE);
 	Timer2.setPeriod(100000);	// 10Hz in microseconds
-	Timer2.attachCompare1Interrupt([](){Serial.println("Error!");});
+	Timer2.attachCompare1Interrupt(printErr);
 	Timer2.pause();
 }
 
@@ -49,11 +54,12 @@ void Pedal::calibrate(){
 	}
 	
 	//add dead zone
-	mini -= dZone[0];
-	maxi -= dZone[1];
+	//mini -= dZone[0];
+	//maxi -= dZone[1];
 	
 	//initialize error: error is 10% of the range between maxi and mini
-	err = maxi-mini/10;
+	err = 2;
+	//err = maxi-mini/10;
 	Serial.print(mini); Serial.print(" = mini, maxi = "); Serial.println(maxi);
 }
 
@@ -63,6 +69,7 @@ byte Pedal::read(){
 	byte linVal = analogRead(lin)>>4;
 	
 	//check if there's an error
+	Serial.print(Timer2.getCount()); Serial.print(" ");
 	if(check(currVal, linVal)){
 		
 		//disable timer if its running
@@ -76,7 +83,9 @@ byte Pedal::read(){
 	
 	//error
 	else{
+		Serial.print("err!");
 		flag = true;
 		Timer2.resume();
 	}
+	return 0;
 }
