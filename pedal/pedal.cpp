@@ -41,17 +41,26 @@ inline bool Pedal::check(byte rotVal, byte linVal){
 }
 
 void Pedal::calibrate(){
-	byte currVal;
-	
+	byte currVal, linVal;
+	byte lini, laxi;	//linear pot min and max
 	//initialize mini to current value
 	mini = analogRead(rot) >> 4;
+	lini = analogRead(lin) >> 4;
 	
 	//populate map with read values
 	while(!Serial.available()){
+		//read values
 		currVal = analogRead(rot)>>4;
-		potVal[currVal] = analogRead(lin)>>4;
+		linVal = analogRead(lin)>>4;
+		
+		//store values
+		potVal[currVal] = linVal;
+		
+		//set mini and maxi
 		if(mini > currVal) mini = currVal;
 		else if(maxi < currVal) maxi = currVal;
+		if(lini > linVal) lini = linVal;
+		else if(laxi < linVal) laxi = linVal;
 	}
 	
 	//add dead zone
@@ -59,8 +68,7 @@ void Pedal::calibrate(){
 	//maxi -= dZone[1];
 	
 	//initialize error: error is 10% of the range between maxi and mini
-	err = 2;
-	//err = maxi-mini/10;
+	err = (laxi-lini)/10;
 	Serial.print(mini); Serial.print(" = mini, maxi = "); Serial.println(maxi);
 }
 
