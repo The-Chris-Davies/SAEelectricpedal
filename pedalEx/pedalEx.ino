@@ -21,7 +21,7 @@ void loop() {
 	digitalWrite(PC13, HIGH);
 	
 	Pedal ped(ROTARYPIN, LINEARPIN);
-	byte val;
+	short val;
 	
 	//calibrate pedal
 	ped.calibrate();
@@ -36,6 +36,9 @@ void loop() {
 	//continuously read and print pedal value
 	while(true){
 		val = ped.read();
+		if(val == -1){
+			Serial.print ("Pedal Read Error!");
+		}
 		Serial.println(val);
 	}
 }

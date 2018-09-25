@@ -10,10 +10,11 @@
 
 #include "Arduino.h"
 #include "pedal.h"
-void printErr(){
-	while(true){
-		Serial.println("Error!");
-	}
+
+bool errFlag;	//if the pedal has a read error > 100ms
+
+void setErr(){
+	errFlag = true;
 }
 
 Pedal::Pedal(int rotaryPin, int linearPin){
@@ -23,14 +24,15 @@ Pedal::Pedal(int rotaryPin, int linearPin){
 	mini = -1;
 	maxi = 0;
 	err = 0;
+	errFlag = false;
 	dZone[0] = 10;
 	dZone[1] = 10;
 	for(unsigned int i = 0; i < 256; i++) potVal[i] = 0;
 	
 	//100ms timer for error
 	Timer2.setMode(TIMER_CH1, TIMER_OUTPUTCOMPARE);
-	Timer2.setPeriod(100000);	// 10Hz in microseconds
-	Timer2.attachCompare1Interrupt(printErr);
+	Timer2.setPeriod(100000);	// 100Hz in microseconds
+	Timer2.attachCompare1Interrupt(setErr);
 	Timer2.pause();
 }
 
@@ -63,10 +65,15 @@ void Pedal::calibrate(){
 	Serial.print(mini); Serial.print(" = mini, maxi = "); Serial.println(maxi);
 }
 
-byte Pedal::read(){
+short Pedal::read(){
 	//read and store the values
 	byte currVal = analogRead(rot)>>4;
 	byte linVal = analogRead(lin)>>4;
+	
+	//if errFlag is set, return 0 and print err
+	if(errFlag){
+		return -1;
+	}
 	
 	//check if there's an error
 	Serial.print(Timer2.getCount()); Serial.print(" ");
