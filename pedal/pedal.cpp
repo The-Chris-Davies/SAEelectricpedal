@@ -100,6 +100,6 @@ short Pedal::read(){
 		Serial.print("err!");
 		flag = true;
 		Timer2.resume();
+		return constrain(map(currVal, mini, maxi, 0, 255), 0, 255);
 	}
-	return 0;
 }
