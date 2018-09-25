@@ -11,7 +11,14 @@
 #include "Arduino.h"
 #include "pedal.h"
 
+bool errFlag;	//if the pedal has a read error > 100ms
+
+void setErr(){
+	errFlag = true;
+}
+
 Pedal::Pedal(int rotaryPin, int linearPin){
+	//value initialization
 	rot = rotaryPin;
 	lin = linearPin;
 	mini = -1;
@@ -20,38 +27,71 @@ Pedal::Pedal(int rotaryPin, int linearPin){
 	dZone[0] = 10;
 	dZone[1] = 10;
 	for(unsigned int i = 0; i < 256; i++) potVal[i] = 0;
+	
+	//100ms timer for error
+	Timer2.setMode(TIMER_CH1, TIMER_OUTPUTCOMPARE);
+	Timer2.setPeriod(100000);	// 100Hz in microseconds
+	Timer2.attachCompare1Interrupt(setErr);
+	Timer2.pause();
 }
 
+//returns true if error is within acceptable levels
 inline bool Pedal::check(byte rotVal, byte linVal){
 	return (potVal[rotVal] < linVal+err && potVal[rotVal] > linVal-err);
 }
 
 void Pedal::calibrate(){
 	byte currVal;
+	
+	//initialize mini to current value
 	mini = analogRead(rot) >> 4;
+	
+	//populate map with read values
 	while(!Serial.available()){
 		currVal = analogRead(rot)>>4;
 		potVal[currVal] = analogRead(lin)>>4;
 		if(mini > currVal) mini = currVal;
 		else if(maxi < currVal) maxi = currVal;
 	}
-	mini -= dZone[0];
-	maxi -= dZone[1];
-	err = maxi-mini/10;	//error is 10% of the range between maxi and mini
+	
+	//add dead zone
+	//mini -= dZone[0];
+	//maxi -= dZone[1];
+	
+	//initialize error: error is 10% of the range between maxi and mini
+	err = 2;
+	//err = maxi-mini/10;
 	Serial.print(mini); Serial.print(" = mini, maxi = "); Serial.println(maxi);
 }
 
-byte Pedal::read(){
+short Pedal::read(){
+	//read and store the values
 	byte currVal = analogRead(rot)>>4;
 	byte linVal = analogRead(lin)>>4;
+	
+	//if errFlag is set, return 0 and print err
+	if(errFlag){
+		return -1;
+	}
+	
+	//check if there's an error
+	Serial.print(Timer2.getCount()); Serial.print(" ");
 	if(check(currVal, linVal)){
-		if(currVal < mini) return 0;
-		else if(currVal > maxi) return 255;
-		return map(currVal, mini, maxi, 0, 255);
+		
+		//disable timer if its running
+		if(flag){
+			Timer2.pause();
+			Timer2.refresh();
+		}
+		//return pedal position, mapped between 0 and 255
+		return constrain(map(currVal, mini, maxi, 0, 255), 0, 255);
 	}
+	
+	//error
 	else{
-		//Maybe a flashing LED to indicate a problem?
+		Serial.print("err!");
+		flag = true;
+		Timer2.resume();
 	}
-	//error handling here
-	Serial.print("Dead!");
+	return 0;
 }
