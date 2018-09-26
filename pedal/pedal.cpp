@@ -63,10 +63,6 @@ void Pedal::calibrate(){
 		else if(laxi < linVal) laxi = linVal;
 	}
 	
-	//add dead zone
-	//mini -= dZone[0];
-	//maxi -= dZone[1];
-	
 	//initialize error: error is 10% of the range between maxi and mini
 	err = (laxi-lini)/10;
 	Serial.print(mini); Serial.print(" = mini, maxi = "); Serial.println(maxi);
@@ -92,7 +88,7 @@ short Pedal::read(){
 			Timer2.refresh();
 		}
 		//return pedal position, mapped between 0 and 255
-		return constrain(map(currVal, mini, maxi, 0, 255), 0, 255);
+		return constrain(map(currVal, mini+dZone[0], maxi-dZone[1], 0, 255), 0, 255);
 	}
 	
 	//error
@@ -100,6 +96,6 @@ short Pedal::read(){
 		Serial.print("err!");
 		flag = true;
 		Timer2.resume();
-		return constrain(map(currVal, mini, maxi, 0, 255), 0, 255);
+		return constrain(map(currVal, mini+dZone[0], maxi-dZone[1], 0, 255), 0, 255);
 	}
 }
