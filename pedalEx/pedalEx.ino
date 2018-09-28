@@ -4,28 +4,27 @@ map linear pot to rotary pot during calibration, then run checks to see if map f
 */
 #include "pedal.h"
 
-#define ROTARYPIN PB1
-#define LINEARPIN PB0
+#define ROTARYPIN PA2
+#define LINEARPIN PA1
 
 void setup() {
-	//PB10 will be used as an input for calibration ISR
-	pinMode(PB10, INPUT);
+	pinMode(PB13, INPUT);	//PB13: Calibration mode
+	pinMoe(PB14, INPUT);	//PB14: Run mode
+	pinMode(PA0, OUTPUT);
 	Serial.begin(9600);
 }
-
+Pedal ped(ROTARYPIN, LINEARPIN);
+	short val;
 void loop() {
 	
 	//begin and initialize pedal controller
 	delay(500);
-	Serial.println("test start");
 	digitalWrite(PC13, HIGH);
 	
-	Pedal ped(ROTARYPIN, LINEARPIN);
-	short val;
+	
 	
 	//calibrate pedal
 	ped.calibrate();
-	Serial.println("initialized");
 	
 	//blink LED to show calibration has exited
 	digitalWrite(PC13, LOW);
@@ -40,5 +39,6 @@ void loop() {
 			Serial.print ("Pedal Read Error!");
 		}
 		Serial.println(val);
+		analogWrite(PA0, val);
 	}
 }
