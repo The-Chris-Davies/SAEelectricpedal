@@ -11,10 +11,15 @@
 #include "Arduino.h"
 #include "pedal.h"
 
-bool errFlag;	//if the pedal has a read error > 100ms
+volatile bool errFlag;	//if the pedal has a read error > 100ms
+volatile bool calibFlag;	//if calibration pin is lowered
 
 void setErr(){
 	errFlag = true;
+}
+
+void endCalib(){
+	calibFlag = true;
 }
 
 Pedal::Pedal(int rotaryPin, int linearPin){
@@ -40,15 +45,18 @@ inline bool Pedal::check(byte rotVal, byte linVal){
 	return (potVal[rotVal] < linVal+err && potVal[rotVal] > linVal-err);
 }
 
-void Pedal::calibrate(){
+void Pedal::calibrate(int interPin){
+	
+	attachInterrupt(interPin, endCalib, FALLING);
+	
 	byte currVal, linVal;
 	byte lini, laxi;	//linear pot min and max
 	//initialize mini to current value
 	mini = analogRead(rot) >> 4;
 	lini = analogRead(lin) >> 4;
 	
-	//populate map with read values
-	while(!Serial.available()){
+	//populate map with read values - exit on serial input or calibration flag dropping
+	while(!calibFlag && !serial.available()){
 		//read values
 		currVal = analogRead(rot)>>4;
 		linVal = analogRead(lin)>>4;
@@ -62,6 +70,8 @@ void Pedal::calibrate(){
 		if(lini > linVal) lini = linVal;
 		else if(laxi < linVal) laxi = linVal;
 	}
+	
+	detachInterrupt(interPin);
 	
 	//initialize error: error is 10% of the range between maxi and mini
 	err = (laxi-lini)/10;
