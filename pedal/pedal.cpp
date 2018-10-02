@@ -46,9 +46,14 @@ inline bool Pedal::check(byte rotVal, byte linVal){
 }
 
 void Pedal::calibrate(int interPin){
-	
 	byte currVal, linVal;
 	byte lini, laxi;	//linear pot min and max
+	
+	//reset errFlag and timer
+	errFlag = false;
+	Timer2.pause();
+	Timer2.refresh();
+	
 	//initialize mini to current value
 	mini = analogRead(rot) >> 4;
 	lini = analogRead(lin) >> 4;
