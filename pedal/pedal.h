@@ -21,7 +21,6 @@ class Pedal{
 		bool flag;				//whether timer is running
 		int rot, lin;					//the pins to test
 		inline bool check(byte, byte);	//check if the byte is ok
-		void pedalCB();			//interrupt function for err check
 	
 	public:
 		Pedal(int, int);

@@ -3,22 +3,17 @@ just reads the values from the specified pins and writes them to serial.
 
 */
 
-#define ROTARYPIN PB1
-#define LINEARPIN PB0
+#define ROTARYPIN PA1
+#define LINEARPIN PA0
 
 byte lin, rot;
 
 void setup() {
 	pinMode(PC13, OUTPUT);
 	Serial.begin(9600);
-	
+	pinMode(PB13, INPUT);	//PB13: Calibration mode
+	pinMode(PB14, INPUT);	//PB14: Run mode
 	//Test start
-	Serial.println("test start");
-	digitalWrite(PC13, HIGH);
-	Serial.println("initialized");
-	digitalWrite(PC13, LOW);
-	delay(500);
-	digitalWrite(PC13, HIGH);
 	delay(500);
 }
 
@@ -28,4 +23,5 @@ void loop() {
 	rot = analogRead(ROTARYPIN)>>4;
 	lin = analogRead(LINEARPIN)>>4;
 	Serial.print(rot); Serial.print(" : "); Serial.println(lin);
+	Serial.print(digitalRead(PB13)); Serial.print(" : "); Serial.println(digitalRead(PB14));
 }

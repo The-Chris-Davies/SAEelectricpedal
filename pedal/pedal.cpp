@@ -12,17 +12,14 @@
 #include "pedal.h"
 
 volatile bool errFlag;	//if the pedal has a read error > 100ms
-volatile bool calibFlag;	//if calibration pin is lowered
 
 void setErr(){
 	errFlag = true;
 }
 
-void endCalib(){
-	calibFlag = true;
-}
-
 Pedal::Pedal(int rotaryPin, int linearPin){
+	delay(1000);
+	Serial.println("value init");
 	//value initialization
 	rot = rotaryPin;
 	lin = linearPin;
@@ -33,11 +30,14 @@ Pedal::Pedal(int rotaryPin, int linearPin){
 	dZone[1] = 10;
 	for(unsigned int i = 0; i < 256; i++) potVal[i] = 0;
 	
+	Serial.println("now doing timer init");
+	
 	//100ms timer for error
 	Timer2.setMode(TIMER_CH1, TIMER_OUTPUTCOMPARE);
 	Timer2.setPeriod(100000);	// 100Hz in microseconds
 	Timer2.attachCompare1Interrupt(setErr);
 	Timer2.pause();
+	Serial.println("init done");
 }
 
 //returns true if error is within acceptable levels
@@ -47,8 +47,6 @@ inline bool Pedal::check(byte rotVal, byte linVal){
 
 void Pedal::calibrate(int interPin){
 	
-	attachInterrupt(interPin, endCalib, FALLING);
-	
 	byte currVal, linVal;
 	byte lini, laxi;	//linear pot min and max
 	//initialize mini to current value
@@ -56,7 +54,7 @@ void Pedal::calibrate(int interPin){
 	lini = analogRead(lin) >> 4;
 	
 	//populate map with read values - exit on serial input or calibration flag dropping
-	while(!calibFlag && !serial.available()){
+	while(digitalRead(interPin) && !Serial.available()){
 		//read values
 		currVal = analogRead(rot)>>4;
 		linVal = analogRead(lin)>>4;
@@ -70,8 +68,6 @@ void Pedal::calibrate(int interPin){
 		if(lini > linVal) lini = linVal;
 		else if(laxi < linVal) laxi = linVal;
 	}
-	
-	detachInterrupt(interPin);
 	
 	//initialize error: error is 10% of the range between maxi and mini
 	err = (laxi-lini)/10;
