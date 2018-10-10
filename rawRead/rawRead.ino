@@ -13,6 +13,8 @@ void setup() {
 	Serial.begin(9600);
 	pinMode(PB13, INPUT);	//PB13: Calibration mode
 	pinMode(PB14, INPUT);	//PB14: Run mode
+	pinMode(PA0, INPUT);
+	pinMode(PA1, INPUT);
 	//Test start
 	delay(500);
 }
@@ -22,6 +24,6 @@ void loop() {
 	//Test main loop
 	rot = analogRead(ROTARYPIN)>>4;
 	lin = analogRead(LINEARPIN)>>4;
-	Serial.print(rot); Serial.print(" : "); Serial.println(lin);
+	Serial.print(rot); Serial.print(" : "); Serial.print(lin); Serial.print(" : ");
 	Serial.print(digitalRead(PB13)); Serial.print(" : "); Serial.println(digitalRead(PB14));
 }

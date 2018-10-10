@@ -17,11 +17,13 @@ short val;
 
 void loop() {
 	Pedal ped(ROTARYPIN, LINEARPIN);
+	bool calibFlag = false;
 	while(1){
 		//begin and initialize pedal controller
-		if(digitalRead(PB13)){
+		if(digitalRead(PB13) && !calibFlag){
 			Serial.println("calibrating");
 			ped.calibrate(PB13);
+			calibFlag = true;
 			Serial.println("done calib");
 		}
 		
