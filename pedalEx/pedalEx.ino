@@ -4,8 +4,8 @@ map linear pot to rotary pot during calibration, then run checks to see if map f
 */
 #include "pedal.h"
 
-#define ROTARYPIN PA2
-#define LINEARPIN PA1
+#define ROTARYPIN PA1
+#define LINEARPIN PA0
 
 void setup() {
 	pinMode(PB13, INPUT);	//PB13: Calibration mode

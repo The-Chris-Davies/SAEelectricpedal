@@ -15,12 +15,12 @@
 
 class Pedal{
 	private:
-		byte potVal[255];		//the map between the values. Index is rotary, value is linear.
-		byte mini, maxi, err;	//minimum, maximum, and error values for the rotary pot
-		byte dZone[2];			//the dead zone at the top/bottom of the pedal.
+		uint8_t potVal[256];		//the map between the values. Index is rotary, value is linear.
+		int16_t mini, maxi, err;	//minimum, maximum, and error values for the rotary pot
+		uint8_t dZone[2];			//the dead zone at the top/bottom of the pedal.
 		bool flag;				//whether timer is running
 		int rot, lin;					//the pins to test
-		inline bool check(byte, byte);	//check if the byte is ok
+		inline bool check(uint8_t, uint8_t);	//check if the uint8_t is ok
 	
 	public:
 		Pedal(int, int);

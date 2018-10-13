@@ -26,8 +26,8 @@ Pedal::Pedal(int rotaryPin, int linearPin){
 	mini = -1;
 	maxi = 0;
 	err = 0;
-	dZone[0] = 5;
-	dZone[1] = 5;
+	dZone[0] = 20;
+	dZone[1] = 20;
 	for(unsigned int i = 0; i < 256; i++) potVal[i] = 0;
 	
 	Serial.println("now doing timer init");
@@ -41,13 +41,13 @@ Pedal::Pedal(int rotaryPin, int linearPin){
 }
 
 //returns true if error is within acceptable levels
-inline bool Pedal::check(byte rotVal, byte linVal){
+inline bool Pedal::check(uint8_t rotVal, uint8_t linVal){
 	return (potVal[rotVal] < linVal+err && potVal[rotVal] > linVal-err);
 }
 
 void Pedal::calibrate(int interPin){
-	byte currVal, linVal;
-	byte lini, laxi;	//linear pot min and max
+	uint8_t currVal, linVal;
+	uint8_t lini, laxi;	//linear pot min and max
 	
 	//reset errFlag and timer
 	errFlag = false;
@@ -77,12 +77,16 @@ void Pedal::calibrate(int interPin){
 	//initialize error: error is 10% of the range between maxi and mini
 	err = (laxi-lini)/10;
 	Serial.print(mini); Serial.print(" = mini, maxi = "); Serial.println(maxi);
+	Serial.println("Dump of potVal:");
+	for(unsigned int i = 0; i < 256; i++){
+		Serial.print(i); Serial.print(" : "); Serial.println(potVal[i]);
+	}
 }
 
 short Pedal::read(){
 	//read and store the values
-	byte currVal = analogRead(rot)>>4;
-	byte linVal = analogRead(lin)>>4;
+	uint8_t currVal = analogRead(rot)>>4;
+	uint8_t linVal = analogRead(lin)>>4;
 	
 	//if errFlag is set, return 0 and print err
 	if(errFlag){
@@ -90,7 +94,7 @@ short Pedal::read(){
 	}
 	
 	//check if there's an error
-	Serial.print(Timer2.getCount()); Serial.print(" ");
+	//Serial.print(Timer2.getCount()); Serial.print(" ");
 	if(check(currVal, linVal)){
 		
 		//disable timer if its running
