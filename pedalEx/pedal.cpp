@@ -26,8 +26,8 @@ Pedal::Pedal(int rotaryPin, int linearPin){
 	mini = -1;
 	maxi = 0;
 	err = 0;
-	dZone[0] = 10;
-	dZone[1] = 10;
+	dZone[0] = 5;
+	dZone[1] = 5;
 	for(unsigned int i = 0; i < 256; i++) potVal[i] = 0;
 	
 	Serial.println("now doing timer init");
