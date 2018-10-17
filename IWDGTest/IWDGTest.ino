@@ -3,6 +3,7 @@ Testing watchdog timer on STM32
 
 */
 
+#include <libmaple/iwdg.h>
 
 void setup() {
 	Serial.begin(19200);
@@ -12,7 +13,7 @@ void setup() {
 	//watchdog timer is 40kHz:
 	//prescaler value of 32 (from IWDG_PRE_32) gives approx. 1 ms per counter value.
 
-	iwdg_init(IWDG_PRE_32, 100)	//init watchdog (very roughly 100ms)
+	iwdg_init(IWDG_PRE_32, 10);	//init watchdog (very roughly 10ms - closer to 8ms)
 }
 
 bool feeding = false;
