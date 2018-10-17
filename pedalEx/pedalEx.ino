@@ -4,12 +4,14 @@ map linear pot to rotary pot during calibration, then run checks to see if map f
 */
 #include "pedal.h"
 
-#define ROTARYPIN PA1
-#define LINEARPIN PA0
+#define ROTARYPIN PA2
+#define LINEARPIN PA1
+#define APPSOUT PA0
 
 void setup() {
 	pinMode(PB13, INPUT);	//PB13: Calibration mode
 	pinMode(PB14, INPUT);	//PB14: Run mode
+	pinMode(APPSOUT, OUTPUT);	//set output pin
 	Serial.begin(9600);
 	delay(2000);
 }
@@ -32,8 +34,12 @@ void loop() {
 			val = ped.read();
 			if(val == -1){
 				Serial.print ("Pedal Read Error!");
+				analogWrite(APPSOUT, 0)
 			}
-			Serial.println(val);
+			else {
+				Serial.println(val);
+				analogWrite(APPSOUT, val);
+			}
 		}
 	}
 }
