@@ -1,0 +1,3 @@
+#command to flash bootloader onto stm32
+#note: 0x8000000 is the init address
+st-flash erase && st-flash write generic_boot20_pc13.bin 0x8000000
