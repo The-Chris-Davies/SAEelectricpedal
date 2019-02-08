@@ -3,8 +3,8 @@ just reads the values from the specified pins and writes them to serial.
 
 */
 
-#define ROTARYPIN PA1
-#define LINEARPIN PA0
+#define ROTARYPIN PA2
+#define LINEARPIN PA1
 
 byte lin, rot;
 
